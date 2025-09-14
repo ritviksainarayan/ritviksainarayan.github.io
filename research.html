@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>Ritvik Sai Narayan</title>
+  <title>Ritvik Sai Narayan — Research</title>
   <meta name="description" content="">
   <meta name="keywords" content="">
 
@@ -23,11 +23,19 @@
   <link href="assets/vendor/aos/aos.css" rel="stylesheet">
   <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
   <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
-  
 
   <!-- Main CSS File -->
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <link href="assets/css/main.css" rel="stylesheet">
+
+  <!-- Small helper styles to keep figures responsive on mobile -->
+  <style>
+    .figure-cap { font-size: 14px; }
+    .figure-wrap img { width: 100%; height: auto; max-width: 100%; }
+    .max-480 { max-width: 480px; }
+    .max-520 { max-width: 520px; }
+    .max-600 { max-width: 600px; }
+  </style>
 
   <!-- =======================================================
   * Template Name: FolioOne
@@ -40,56 +48,59 @@
 
 <body class="index-page">
 
-<header id="header" class="header d-flex align-items-center light-background sticky-top">
-  <div class="container position-relative d-flex align-items-center justify-content-between">
+  <header id="header" class="header d-flex align-items-center light-background sticky-top">
+    <div class="container position-relative d-flex align-items-center justify-content-between">
 
-    <!-- Hamburger should be visible even when nav is hidden -->
-    <i class="mobile-nav-toggle d-xl-none bi bi-list" aria-label="Toggle navigation"></i>
+      <!-- Hamburger should be visible even when nav is hidden -->
+      <i class="mobile-nav-toggle d-xl-none bi bi-list" aria-label="Toggle navigation"></i>
 
-    <nav id="navmenu" class="navmenu">
-      <ul>
-        <li><a href="index.html">Home</a></li>
-        <li><a href="research.html" class="active">Research</a></li>
-        <li><a href="cv.html">CV</a></li>
-        <li><a href="contact.html">Contact</a></li>
-      </ul>
-    </nav>
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="research.html" class="active">Research</a></li>
+          <li><a href="cv.html">CV</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </nav>
 
-  </div>
-</header>
-
+    </div>
+  </header>
 
   <main class="main">
 
-     <section id="starter-section" class="starter-section section">
+    <!-- Section: Roman update -->
+    <section id="roman-update" class="starter-section section">
       <div class="container">
-        <div class="row align-items-center" data-aos="fade-up">
-          <h2 data-aos="fade-up" data-aos-delay="200" class="fw-bold"><span class="highlight">Twinkle Twinkle Little Star, Roman Sees Where You Are</span></h2>
-          <!-- Text on the left -->
+        <div class="row align-items-center g-4" data-aos="fade-up">
+          <div class="col-12">
+            <h2 data-aos="fade-up" data-aos-delay="200" class="fw-bold">
+              <span class="highlight">Twinkle Twinkle Little Star, Roman Sees Where You Are</span>
+            </h2>
+          </div>
+
+          <!-- Text -->
           <div class="col-lg-6">
-            
-            <p>
-              Watch this space for updates!
-            </p>
+            <p>Watch this space for updates!</p>
           </div>
 
-          <!-- Image on the right -->
-          <div class="col-lg-6 text-center">
-          </div>
-
+          <!-- Image (empty for now, reserved layout) -->
+          <div class="col-lg-6 text-center"></div>
         </div>
+      </div>
     </section>
 
-
-
-    <!-- Starter Section Section -->
-    <section id="starter-section" class="starter-section section">
+    <!-- Section: Binaries 1 -->
+    <section id="binaries-1" class="starter-section section">
       <div class="container">
-        <div class="row align-items-center" data-aos="fade-up">
-          <h2 data-aos="fade-up" data-aos-delay="200" class="fw-bold"><span class="highlight">Barking Binaries Don't Bite</span></h2>
-          <!-- Text on the left -->
+        <div class="row align-items-center g-4" data-aos="fade-up">
+          <div class="col-12">
+            <h2 data-aos="fade-up" data-aos-delay="200" class="fw-bold">
+              <span class="highlight">Barking Binaries Don't Bite</span>
+            </h2>
+          </div>
+
+          <!-- Text -->
           <div class="col-lg-6">
-            
             <p>
               The lifecycles of stars are determined by their masses and chemical compositions.
               More massive stars burn through their fuel quicker than lower mass stars, and being hotter,
@@ -106,116 +117,119 @@
             </p>
           </div>
 
-          <!-- Image on the right -->
+          <!-- Image -->
           <div class="col-lg-6 text-center">
-            <img src="assets/img/research/m56.jpg" class="img-fluid rounded-3 shadow" style="width: 480px; height: auto;" alt="Star Cluster">
-            <br>
-            <p style="font-size: 14px;"> The globular cluster M56, which is nearly 33,000 light years away!</p>
-            <br>
-            <p style="font-size: 14px;">Credit: Ron Brecher</p>
+            <div class="figure-wrap mx-auto max-480">
+              <img src="assets/img/research/m56.jpg"
+                   class="img-fluid rounded-3 shadow mx-auto d-block"
+                   alt="Star Cluster M56">
+            </div>
+            <p class="figure-cap mt-2">The globular cluster M56, which is nearly 33,000 light years away!</p>
+            <p class="figure-cap">Credit: Ron Brecher</p>
           </div>
 
         </div>
+      </div>
     </section>
-<!-- New section: image LEFT (desktop), text RIGHT -->
-<section id="binaries-2" class="starter-section section">
-  <div class="container">
-    <div class="row align-items-center g-5" data-aos="fade-up">
 
-      <!-- Image column -->
-      <div class="col-lg-6 order-lg-1 order-2 text-center">
-        <img src="assets/img/research/isochrone.png"
-             class="img-fluid rounded-3 shadow"
-             alt="NGC 188 open cluster"
-             style="max-width: 600px; height: auto;">
-        <p style="font-size: 14px;">This figure shows the brightness (G<sub>0</sub>) and temperature ((G<sub>BP</sub>-G<sub>BP</sub>)<sub>0</sub>) 
-            of stars in NGC 188. The yellow "isochrone" closely tracks the evolution of stars in NGC 188 and stars with higher masses move quicker through 
-            this line (hence, you see fewer evolved stars). In the blue (shaded) region, you can also see stars that stick out of the pack (BSSs!), as they
-            straggle behind the other stars. 
-          </p>
+    <!-- Section: Binaries 2 -->
+    <section id="binaries-2" class="starter-section section">
+      <div class="container">
+        <div class="row align-items-center g-5" data-aos="fade-up">
+
+          <!-- Image column -->
+          <div class="col-lg-6 order-lg-1 order-2 text-center">
+            <div class="figure-wrap mx-auto max-600">
+              <img src="assets/img/research/isochrone.png"
+                   class="img-fluid rounded-3 shadow mx-auto d-block"
+                   alt="NGC 188 open cluster isochrone and CMD">
+            </div>
+            <p class="figure-cap mt-2">
+              This figure shows the brightness (G<sub>0</sub>) and temperature ((G<sub>BP</sub>−G<sub>BP</sub>)<sub>0</sub>) 
+              of stars in NGC 188. The yellow "isochrone" closely tracks the evolution of stars in NGC 188 and stars with higher masses move quicker through 
+              this line (hence, you see fewer evolved stars). In the blue (shaded) region, you can also see stars that stick out of the pack (BSSs!), as they
+              straggle behind the other stars. 
+            </p>
+          </div>
+
+          <!-- Text column -->
+          <div class="col-lg-6 order-lg-2 order-1">
+            <p>My research tries to understand how these stars form.</p>
+            <p>
+              BSSs are thought to have been formed through interactions between binary stars–a pair of stars that orbit each other–with mass transfer between the 
+              binary companions being the most prevelant formation mechanism. Binary stars often can have unequal masses (which means that one star
+              can evolve faster than its companion).
+            </p>
+            <p>
+              As the more massive star in a binary evolves from the main sequence (core
+              hydrogen fusion occurs during this time) to become a red giant (shell hydrogen fusion), its outer layers begin to expand and fill its Roche lobe, the region around a star within which the orbiting material is
+              gravitationally bound to that star. Once the star fills this region, any further expansion will cause the
+              mass of the giant to flow onto its companion. As more mass accumulates on the accreting star, it
+              becomes bluer and brighter. Ultimately the donor is left with nothing but its hot, exposed core (white-dwarf).
+            </p>
+            <p>
+              Many post-transfer systems hide their white-dwarf companions; their main-sequence counterpart is simply brighter in the light humans can see. 
+              However, a mild far-UV excess, the wavelengths of light where the white-dwarf dominates, 
+              is a classic signature even when the WD is invisible in optical light. These mass-transfer remnants often sit at long periods (hundreds to thousands of days).
+              Sometimes these stars go around each other in a circular orbit, other times in an eccentric (elliptical) orbit. Understanding the mechanism(s) of mass
+              transfer and its role in producing different outcomes is still an open question today.
+            </p>
+          </div>
+
+        </div>
       </div>
+    </section>
 
-      <!-- Text column -->
-      <div class="col-lg-6 order-lg-2 order-1">
-        <p>
-          My research tries to understand how these stars form. 
-        </p>  
-        <p></p>  
-          BSSs are thought to have been formed through interactions between binary stars–a pair of stars that orbit each other–with mass transfer between the 
-          binary companions being the most prevelant formation mechanism. Binary stars often can have unequal masses (which means that one star
-          can evolve faster than its companion). </p>
-          
-          <p>As the more massive star in a binary evolves from the main sequence (core
-          hydrogen fusion occurs during this time) to become a red giant (shell hydrogen fusion), its outer layers begin to expand and fill its Roche lobe, the region around a star within which the orbiting material is
-          gravitationally bound to that star. Once the star fills this region, any further expansion will cause the
-          mass of the giant to flow onto its companion. As more mass accumulates on the accreting star, it
-          becomes bluer and brighter. Ultimately the donor is left with nothing but its hot, exposed core (white-dwarf). 
-          </p>
-          <p>
-          Many post-transfer systems hide their white-dwarf companions; their main-sequence counterpart is simply brighter in the light humans can see. 
-          However, a mild far-UV excess, the wavelengths of light where the white-dwarf dominates, 
-          is a classic signature even when the WD is invisible in optical light. These mass-transfer remnants often sit at long periods (hundreds to thousands of days).
-          Sometimes these stars go around each other in a circular orbit, other times in an eccentric (elliptical) orbit. Understanding the mechanism(s) of mass
-          transfer and its role in producing different outcomes is still an open question today. 
-        </p>
+    <!-- Bottom gallery: two images side by side, centered -->
+    <section id="bottom-gallery" class="section py-4">
+      <div class="container">
+        <div class="row justify-content-center g-4 text-center" data-aos="fade-up">
+
+          <!-- Image 1 -->
+          <div class="col-10 col-sm-8 col-md-6 col-lg-5">
+            <a href="assets/img/research/binary.gif" class="glightbox" data-gallery="bottom-gallery">
+              <div class="figure-wrap mx-auto max-520">
+                <img src="assets/img/research/binary.gif"
+                     class="img-fluid rounded-3 shadow mx-auto d-block"
+                     alt="Circular vs Eccentric Orbit">
+              </div>
+            </a>
+            <p class="figure-cap mt-2">Eccentric vs Circular Binary Orbit (click to zoom).</p>
+          </div>
+
+          <!-- Image 2 -->
+          <div class="col-10 col-sm-8 col-md-6 col-lg-5">
+            <div class="figure-wrap mx-auto max-520">
+              <img src="assets/img/research/masstransfer.jpg"
+                   class="img-fluid rounded-3 shadow mx-auto d-block"
+                   alt="Mass Transfer">
+            </div>
+            <p class="figure-cap mt-2">
+              Credit: Northwestern. Stellar simulation by Vicky Kalogera, Bart Willems and Francesca Valsecchi. Visualization by Matthew McCrory.
+            </p>
+          </div>
+
+        </div>
       </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- Bottom gallery: two images side by side, centered -->
-<section id="bottom-gallery" class="section py-4">
-  <div class="container">
-    <div class="row justify-content-center g-4 text-center" data-aos="fade-up">
-
-      <!-- Image 1 -->
-      <div class="col-10 col-sm-8 col-md-6 col-lg-5">
-        <a href="assets/img/research/binary.gif" class="glightbox" data-gallery="bottom-gallery">
-          <img src="assets/img/research/binary.gif"
-               class="img-fluid rounded-3 shadow"
-               alt="Circular vs Eccentric Orbit"
-               style="max-width: 520px; height: auto;">
-        </a>
-        <p style="font-size: 14px;">Eccentric vs Circular Binary Orbit (click to zoom).</p>
-      </div>
-
-      <!-- Image 2 -->
-      <div class="col-10 col-sm-8 col-md-6 col-lg-5">
-          <img src="assets/img/research/masstransfer.jpg"
-               class="img-fluid rounded-3 shadow"
-               alt="Mass Transfer"
-               style="max-width: 520px; height: auto;">
-        </a>
-        <p style="font-size: 14px;">Credit: Northwestern. Stellar simulation by Vicky Kalogera, Bart Willems and Francesca Valsecchi. Visualization by Matthew McCrory.</p>
-      </div>
-
-    </div>
-  </div>
-</section>
+    </section>
 
   </main>
 
   <footer id="footer" class="footer">
-
     <div class="container">
-      <div class="social-links d-flex justify-content-center">
-      </div>
+      <div class="social-links d-flex justify-content-center"></div>
       <div class="credits">
-        <!-- All the links in the footer should remain intact. -->
-        <!-- You can delete the links only if you've purchased the pro version. -->
-        <!-- Licensing information: https://bootstrapmade.com/license/ -->
-        <!-- Purchase the pro version with working PHP/AJAX contact form: [buy-url] -->
-         &copy; 2025 Ritvik Sai Narayan.
+        &copy; 2025 Ritvik Sai Narayan.
         <br>
         Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
       </div>
     </div>
-
   </footer>
 
   <!-- Scroll Top -->
-  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center">
+    <i class="bi bi-arrow-up-short"></i>
+  </a>
 
   <!-- Preloader -->
   <div id="preloader"></div>
@@ -236,5 +250,4 @@
   <script src="assets/js/main.js"></script>
 
 </body>
-
 </html>
