@@ -23,11 +23,59 @@
   <link href="assets/vendor/aos/aos.css" rel="stylesheet">
   <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
   <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
-  
 
   <!-- Main CSS File -->
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <link href="assets/css/main.css" rel="stylesheet">
+
+  <!-- Paper updates marquee + box styles (no changes to your intro section) -->
+  <style>
+    .paper-box {
+      border-radius: 1rem;
+      border: 1px solid rgba(0, 0, 0, .06);
+      background: rgba(13, 110, 253, .04); /* subtle primary tint */
+      padding: 1.25rem;
+    }
+    .paper-box .label {
+      font-weight: 700;
+      font-size: .85rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      display: inline-block;
+      padding: .25rem .6rem;
+      border-radius: .5rem;
+      border: 1px solid rgba(220, 53, 69, .25);
+      color: #dc3545;
+      background: rgba(220, 53, 69, .06);
+    }
+
+    /* Marquee heading (modern, accessible; no <marquee> tag) */
+    .marquee-wrap {
+      position: relative;
+      overflow: hidden;
+      border-radius: .6rem;
+      border: 1px solid rgba(0,0,0,.06);
+      background: var(--bs-body-bg);
+      margin-top: .75rem;
+    }
+    .marquee-track {
+      display: inline-flex;
+      white-space: nowrap;
+      gap: 2rem;
+      padding: .5rem 0;
+      will-change: transform;
+      animation: paperMarquee 22s linear infinite;
+    }
+    .marquee-item { font-weight: 600; opacity: .9; }
+    .marquee-track:hover { animation-play-state: paused; }
+    @keyframes paperMarquee {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); } /* duplicate content for seamless loop */
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .marquee-track { animation: none; }
+    }
+  </style>
 
   <!-- =======================================================
   * Template Name: FolioOne
@@ -42,7 +90,6 @@
 
 <header id="header" class="header d-flex align-items-center light-background sticky-top">
   <div class="container position-relative d-flex align-items-center justify-content-between">
-
     <!-- Hamburger should be visible even when nav is hidden -->
     <i class="mobile-nav-toggle d-xl-none bi bi-list" aria-label="Toggle navigation"></i>
 
@@ -54,19 +101,27 @@
         <li><a href="contact.html">Contact</a></li>
       </ul>
     </nav>
-
   </div>
 </header>
-
 
   <main class="main">
 
     <!-- Hero Section -->
     <section id="hero" class="hero section">
-
       <div class="container" data-aos="fade-up" data-aos-delay="100">
 
         <div class="row gy-4 align-items-center">
+          <div class="col-lg-6">
+            <div class="hero-content paper-box" data-aos="fade-up" data-aos-delay="120">
+              <span class="label"> 🚨 New Paper Alert 🚨</span>
+              <p data-aos="fade-up" data-aos-delay="400"> Narayan, R. S., et al. <a href="https://arxiv.org/abs/2509.12315"><em>WIYN Open Cluster Study. XCIII. An Extended Radial-Velocity Survey 
+                and Spectroscopic Binary Orbits in the Open Cluster NGC 188</em></a>, submitted to The Astronomical Journal. </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 2: INTRO + IMAGE (UNCHANGED) -->
+        <div class="row gy-4 align-items-center mt-1">
           <div class="col-lg-6 order-2 order-lg-1">
             <div class="hero-content">
               <h1 data-aos="fade-up" data-aos-delay="200"><span class="highlight">Ritvik Sai Narayan</span></h1>
@@ -75,8 +130,7 @@
                 at the <a href="https://www.astro.wisc.edu/" target="_blank" rel="noopener"> University of Wisconsin-Madison</a>. I like thinking about the 
                 evolution of stars and exoplanets, from both observational and theoretical lenses. I also enjoy the data science and computational aspects of 
                 modern astronomy, and care about how to effectively communicate science results with meaningful visualizations. 
-              <br>
-              <br>
+              <br><br>
                 In my free time, I enjoy working out, binge-watching copius amounts of TV, and mindlessly supporting a Formula 1 team (Forza Ferrari!).
               </p>
               <div class="social-links" data-aos="fade-up" data-aos-delay="600">
@@ -96,21 +150,15 @@
         </div>
 
       </div>
-
     </section><!-- /Hero Section -->
 
   </main>
 
   <footer id="footer" class="footer">
-
     <div class="container">
       <div class="social-links d-flex justify-content-center">
       </div>
       <div class="credits">
-        <!-- All the links in the footer should remain intact. -->
-        <!-- You can delete the links only if you've purchased the pro version. -->
-        <!-- Licensing information: https://bootstrapmade.com/license/ -->
-        <!-- Purchase the pro version with working PHP/AJAX contact form: [buy-url] -->
         Image Credit: NASA, ESA, CSA, STScI. 
         <br>
         &copy; 2025 Ritvik Sai Narayan.
@@ -118,7 +166,6 @@
         Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
       </div>
     </div>
-
   </footer>
 
   <!-- Scroll Top -->
@@ -143,5 +190,4 @@
   <script src="assets/js/main.js"></script>
 
 </body>
-
 </html>
