@@ -1,0 +1,857 @@
+/* =============================================
+   SPACE THEME — ritviksainarayan.com
+   ============================================= */
+
+:root {
+  --star-glow: #FFB020;
+  --jupiter-color: #C8943A;
+  --mars-color: #C04A22;
+  --earth-color: #2EB8D0;
+  --space-bg: #00040F;
+  --text-primary: #E8F4F8;
+  --text-muted: #7A90A0;
+  --panel-bg: rgba(0, 4, 15, 0.96);
+  --orbit-line: rgba(255, 255, 255, 0.07);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%; height: 100%;
+  background: var(--space-bg);
+  color: var(--text-primary);
+  font-family: 'Poppins', 'Segoe UI', sans-serif;
+  overflow: hidden;
+}
+
+/* When panel is open, body can scroll within panel */
+body.panel-open { overflow: hidden; }
+
+/* =============================================
+   STARFIELD CANVAS
+   ============================================= */
+
+#stars {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* =============================================
+   SOLAR SYSTEM VIEW
+   ============================================= */
+
+#solar-system-view {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+#solar-system-view.dissolve {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.92);
+}
+
+/* Site title */
+.site-title {
+  position: absolute;
+  top: clamp(1rem, 3vw, 2rem);
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  z-index: 20;
+  width: max-content;
+  max-width: 90vw;
+}
+
+.site-title h1 {
+  font-family: 'Raleway', sans-serif;
+  font-size: clamp(1.1rem, 3.5vw, 2rem);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #fff;
+  text-shadow: 0 0 40px rgba(253, 179, 71, 0.45);
+  white-space: nowrap;
+}
+
+.site-title .tagline {
+  font-size: clamp(0.55rem, 1.6vw, 0.78rem);
+  color: var(--text-muted);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  margin-top: 0.25rem;
+}
+
+/* Hint text */
+.explore-hint {
+  position: absolute;
+  bottom: clamp(1.5rem, 4vw, 3rem);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  animation: hint-pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes hint-pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.9; }
+}
+
+/* =============================================
+   SYSTEM CONTAINER
+   ============================================= */
+
+.system-container {
+  position: relative;
+  width: min(85vw, 85vh, 680px);
+  height: min(85vw, 85vh, 680px);
+}
+
+/* =============================================
+   CENTRAL STAR
+   ============================================= */
+
+.star-body {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.star-surface {
+  width: clamp(44px, 7.5vmin, 72px);
+  height: clamp(44px, 7.5vmin, 72px);
+  border-radius: 50%;
+  overflow: hidden;
+  position: relative;
+  /* Base solar gradient — fixed bright core, limb darkening */
+  background:
+    radial-gradient(circle at 50% 50%, transparent 38%, rgba(110,25,0,0.5) 100%),
+    radial-gradient(circle at 40% 35%, #FFFAE0 0%, #FFE066 16%, #FFB020 40%, #FF6B10 66%, #C02800 100%);
+  box-shadow:
+    0 0 12px #FFB020,
+    0 0 30px rgba(255,107,16,0.7),
+    0 0 65px rgba(253,160,30,0.35),
+    0 0 120px rgba(253,140,30,0.15);
+  animation: star-breathe 4s ease-in-out infinite;
+  transition: transform 0.25s ease;
+}
+
+/* Rotating sunspot layer */
+.star-surface::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 28% 44%, rgba(80,10,0,0.55) 0%, transparent 12%),
+    radial-gradient(circle at 64% 38%, rgba(70,8,0,0.48) 0%, transparent 9%),
+    radial-gradient(circle at 48% 68%, rgba(90,15,0,0.52) 0%, transparent 11%),
+    radial-gradient(circle at 72% 62%, rgba(60,6,0,0.4)  0%, transparent 7%),
+    radial-gradient(circle at 20% 22%, rgba(75,10,0,0.45) 0%, transparent 8%);
+  animation: star-axial 28s linear infinite;
+}
+
+.star-body:hover .star-surface { transform: scale(1.15); }
+
+@keyframes star-breathe {
+  0%, 100% {
+    box-shadow: 0 0 12px #FFB020, 0 0 30px rgba(255,107,16,.7),
+                0 0 65px rgba(253,160,30,.35), 0 0 120px rgba(253,140,30,.15);
+  }
+  50% {
+    box-shadow: 0 0 20px #FFB020, 0 0 50px rgba(255,107,16,.9),
+                0 0 100px rgba(253,160,30,.5), 0 0 180px rgba(253,140,30,.25);
+  }
+}
+
+@keyframes star-axial {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.star-label {
+  margin-top: 0.5rem;
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(0.48rem, 1.3vmin, 0.62rem);
+  font-weight: 400;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #FDB347;
+  text-shadow: 0 0 10px rgba(253, 179, 71, 0.8);
+  white-space: nowrap;
+}
+
+/* =============================================
+   ORBIT RINGS + PLANETS
+   ============================================= */
+
+.orbit {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 50%;
+  border: 1px solid var(--orbit-line);
+  animation: orbit-spin linear infinite;
+  pointer-events: none; /* orbit bounding box must not intercept inner planet clicks */
+}
+
+/* Children opt back in */
+.planet-wrap { pointer-events: auto; }
+
+/* 1:2:4 resonance, starting longitudes 90° / 270° / 90°
+   delay = -(angle/360) × period
+   Contact:  90° → -2.5s  (90/360 × 10s)
+   CV:      270° → -15s   (270/360 × 20s)
+   Jupiter:  90° → -10s   (90/360 × 40s)              */
+.orbit-1 {
+  --r: clamp(58px, 11vmin, 105px);
+  width: calc(var(--r) * 2);
+  height: calc(var(--r) * 2);
+  animation-duration: 10s;
+  animation-delay: -2.5s;
+}
+
+.orbit-2 {
+  --r: clamp(92px, 17.5vmin, 160px);
+  width: calc(var(--r) * 2);
+  height: calc(var(--r) * 2);
+  animation-duration: 20s;
+  animation-delay: -15s;
+}
+
+.orbit-3 {
+  --r: clamp(168px, 34vmin, 315px);
+  width: calc(var(--r) * 2);
+  height: calc(var(--r) * 2);
+  animation-duration: 40s;
+  animation-delay: -10s;
+}
+
+@keyframes orbit-spin {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to   { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Planet wrapper: counter-rotates to keep label upright */
+.planet-wrap {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  animation: counter-spin linear infinite;
+  /* center the planet on the orbit ring's top edge */
+  transform: translateX(-50%) translateY(-50%);
+}
+
+/* Must EXACTLY match orbit ring durations/delays above */
+.orbit-1 .planet-wrap { animation-duration: 10s; animation-delay: -2.5s; }
+.orbit-2 .planet-wrap { animation-duration: 20s; animation-delay: -15s;  }
+.orbit-3 .planet-wrap { animation-duration: 40s; animation-delay: -10s;  }
+
+@keyframes counter-spin {
+  from { transform: translateX(-50%) translateY(-50%) rotate(0deg); }
+  to   { transform: translateX(-50%) translateY(-50%) rotate(-360deg); }
+}
+
+/* ── Planet spheres ── */
+.planet {
+  border-radius: 50%;
+  overflow: hidden;           /* clips rotating ::before surface */
+  transition: box-shadow 0.2s ease;
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* Scale on hover via the wrapper (avoids transform conflict with rotation) */
+.planet-wrap:hover .planet { transform: scale(1.22); }
+
+/* All planets share a fixed atmosphere overlay on ::after */
+.planet::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  /* specular highlight top-left + limb darkening around edge */
+  background:
+    radial-gradient(circle at 30% 26%, rgba(255,255,255,0.38) 0%, transparent 30%),
+    radial-gradient(ellipse at 50% 50%, transparent 50%, rgba(0,0,0,0.5) 100%);
+  pointer-events: none;
+}
+
+/* ── ORBIT-1: Earth (Contact) ── */
+.planet-contact {
+  width: clamp(22px, 4.2vmin, 40px);
+  height: clamp(22px, 4.2vmin, 40px);
+  box-shadow: 0 0 10px rgba(20,160,220,.5), 0 0 24px rgba(0,110,180,.2);
+}
+
+/* Rotating surface — continents + ocean */
+.planet-contact::before {
+  content: '';
+  position: absolute;
+  inset: -5%;
+  background:
+    radial-gradient(ellipse at 40% 28%, rgba(255,255,255,0.3) 0%, transparent 22%),
+    radial-gradient(ellipse at 72% 58%, rgba(255,255,255,0.2) 0%, transparent 18%),
+    radial-gradient(circle at 58% 42%, rgba(34,120,55,0.8) 0%, transparent 28%),
+    radial-gradient(circle at 27% 63%, rgba(28,105,45,0.6) 0%, transparent 22%),
+    radial-gradient(circle at 73% 28%, rgba(20,90,38,0.5) 0%, transparent 18%),
+    radial-gradient(circle at 45% 40%, #48C8E0 0%, #0A7AC8 42%, #024A90 70%, #001550 100%);
+  animation: axial-spin 22s linear infinite;
+}
+
+/* ── ORBIT-2: Mars (CV) ── */
+.planet-cv {
+  width: clamp(17px, 3.2vmin, 30px);
+  height: clamp(17px, 3.2vmin, 30px);
+  box-shadow: 0 0 10px rgba(210,80,38,.5), 0 0 22px rgba(165,50,18,.18);
+}
+
+.planet-cv::before {
+  content: '';
+  position: absolute;
+  inset: -5%;
+  background:
+    /* polar cap */
+    radial-gradient(ellipse at 50% 4%, rgba(245,225,215,0.45) 0%, transparent 20%),
+    /* dark basins / terrain */
+    radial-gradient(circle at 64% 58%, rgba(80,15,5,0.5) 0%, transparent 28%),
+    radial-gradient(circle at 30% 70%, rgba(100,25,8,0.42) 0%, transparent 22%),
+    radial-gradient(circle at 45% 38%, #E88A5A 0%, #C8481E 38%, #8C2800 70%, #4C0E00 100%);
+  animation: axial-spin 26s linear infinite;
+}
+
+/* ── ORBIT-3: Jupiter (Research) ── */
+.planet-research {
+  width: clamp(36px, 7vmin, 68px);
+  height: clamp(36px, 7vmin, 68px);
+  background: #8C5018; /* base fallback */
+  box-shadow:
+    0 0 16px rgba(210,145,55,.5),
+    0 0 36px rgba(165,100,28,.2);
+}
+
+/* Scrolling atmospheric bands (simulates axial rotation) */
+.planet-research::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg,
+    #C8843C 0%,   #E8B860 6%,  #F8E8C0 11%, #ECD080 17%,
+    #B07030 23%,  #D8A050 29%, #F0D8A0 35%,
+    #C07028 41%,  #E0A848 47%, #F8E0A8 53%,
+    #A86020 59%,  #C8882E 65%, #ECC870 71%,
+    #B87832 77%,  #D8A040 83%, #F0D090 89%,
+    #C08038 95%
+  );
+  background-size: 200% 100%;
+  animation: jup-bands 16s linear infinite;
+}
+
+/* Fixed GRS + enhanced highlight + limb darkening on top of ::after base */
+.planet-research::after {
+  background:
+    radial-gradient(ellipse at 63% 57%, rgba(165,55,20,0.7) 0%, rgba(130,35,10,0.35) 13%, transparent 20%),
+    radial-gradient(circle at 30% 26%, rgba(255,250,230,0.38) 0%, transparent 28%),
+    radial-gradient(ellipse at 50% 50%, transparent 50%, rgba(60,25,5,0.6) 100%);
+}
+
+@keyframes axial-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes jup-bands {
+  from { background-position: 0% 50%; }
+  to   { background-position: 100% 50%; }
+}
+
+/* Planet labels — match tagline: Poppins, uppercase, spaced */
+.planet-label {
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(0.48rem, 1.3vmin, 0.62rem);
+  font-weight: 400;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  margin-top: 0.45rem;
+  opacity: 0.65;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
+
+.planet-wrap:hover .planet-label { opacity: 1; }
+/* Labels match the planet in each orbit */
+.orbit-1 .planet-label { color: #48C8E0; }   /* Earth blue  */
+.orbit-2 .planet-label { color: #E88A5A; }   /* Mars red    */
+.orbit-3 .planet-label { color: #E8B860; }   /* Jupiter tan */
+
+/* =============================================
+   SECTION PANEL OVERLAY
+   ============================================= */
+
+#panel {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: var(--panel-bg);
+  backdrop-filter: blur(20px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  /* Zoom origin set by JS via --cx / --cy */
+  clip-path: circle(0% at var(--cx, 50%) var(--cy, 50%));
+  pointer-events: none;
+  transition: clip-path 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+#panel.open {
+  clip-path: circle(150% at var(--cx, 50%) var(--cy, 50%));
+  pointer-events: auto;
+}
+
+/* Panel content fades in after the circle is mostly open */
+.panel-header,
+.panel-body {
+  opacity: 0;
+  transition: opacity 0.25s ease 0.38s;
+}
+#panel.open .panel-header,
+#panel.open .panel-body {
+  opacity: 1;
+}
+
+/* Panel header */
+.panel-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.9rem 1.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  flex-shrink: 0;
+  background: rgba(0,4,15,0.5);
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: none;
+  border: 1px solid rgba(255,255,255,0.18);
+  color: var(--text-muted);
+  padding: 0.35rem 0.9rem;
+  border-radius: 2rem;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.back-btn:hover {
+  border-color: rgba(255,255,255,0.45);
+  color: #fff;
+  background: rgba(255,255,255,0.05);
+}
+
+.panel-planet-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.panel-planet-name {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+/* Panel scrollable body */
+.panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: clamp(1.5rem, 4vw, 3rem) clamp(1rem, 5vw, 2.5rem);
+}
+
+.panel-body::-webkit-scrollbar { width: 3px; }
+.panel-body::-webkit-scrollbar-track { background: transparent; }
+.panel-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+
+.panel-inner {
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+/* =============================================
+   SECTION CONTENT TYPOGRAPHY
+   ============================================= */
+
+.section-h1 {
+  font-family: 'Raleway', sans-serif;
+  font-size: clamp(1.6rem, 4.5vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 2rem;
+  color: #ffffff;
+}
+
+.section-h2 {
+  font-family: 'Raleway', sans-serif;
+  font-size: clamp(1.05rem, 2.5vw, 1.35rem);
+  font-weight: 600;
+  line-height: 1.4;
+  margin-bottom: 1rem;
+  color: #E0E8F0;
+}
+
+p {
+  font-family: 'Poppins', sans-serif;
+}
+
+p {
+  font-size: clamp(0.88rem, 2vw, 0.97rem);
+  line-height: 1.85;
+  color: #B0C4CF;
+}
+
+p + p { margin-top: 1rem; }
+
+a { color: inherit; }
+
+/* =============================================
+   ABOUT SECTION
+   ============================================= */
+
+.about-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+@media (max-width: 580px) {
+  .about-grid {
+    grid-template-columns: 1fr;
+  }
+  .about-profile { text-align: center; }
+}
+
+.profile-img {
+  width: clamp(120px, 22vw, 200px);
+  height: clamp(120px, 22vw, 200px);
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(253, 179, 71, 0.35);
+  box-shadow: 0 0 30px rgba(253, 179, 71, 0.18), 0 8px 32px rgba(0,0,0,0.5);
+  display: block;
+}
+
+.about-bio a {
+  color: #FDB347;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(253, 179, 71, 0.35);
+  transition: border-color 0.2s;
+}
+.about-bio a:hover { border-bottom-color: #FDB347; }
+
+.social-icons {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 580px) {
+  .social-icons { justify-content: center; }
+}
+
+.social-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+.social-icon:hover {
+  border-color: #FDB347;
+  color: #FDB347;
+  background: rgba(253,179,71,0.08);
+  box-shadow: 0 0 12px rgba(253,179,71,0.3);
+}
+
+/* =============================================
+   RESEARCH SECTION
+   ============================================= */
+
+.research-card {
+  background: rgba(108, 92, 231, 0.05);
+  border: 1px solid rgba(108, 92, 231, 0.18);
+  border-radius: 1rem;
+  padding: 1.5rem 1.75rem;
+  margin-bottom: 2rem;
+}
+
+.research-card + .research-card { border-top: none; }
+
+.research-card p { margin-bottom: 0.9rem; }
+.research-card p:last-child { margin-bottom: 0; }
+
+.research-card a { color: #A29BFE; text-decoration: none; }
+.research-card a:hover { text-decoration: underline; }
+
+.research-img {
+  width: 100%;
+  border-radius: 0.6rem;
+  margin: 1rem 0 0.5rem;
+  display: block;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.6);
+}
+
+.img-caption {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+.rg-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.research-img-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 540px) {
+  .research-img-grid { grid-template-columns: 1fr; }
+  .rg-2col { grid-template-columns: 1fr; }
+}
+
+.research-img-grid figure { margin: 0; }
+
+/* Research overview cards */
+.research-areas {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.research-area-card {
+  display: flex;
+  gap: 1.25rem;
+  align-items: flex-start;
+  background: rgba(108, 92, 231, 0.05);
+  border: 1px solid rgba(108, 92, 231, 0.15);
+  border-radius: 0.875rem;
+  padding: 1.4rem 1.6rem;
+}
+
+.ra-icon {
+  color: #8475F5;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+  opacity: 0.8;
+}
+
+.research-area-card a {
+  color: #A29BFE;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(162,155,254,0.3);
+  transition: border-color 0.2s;
+}
+.research-area-card a:hover { border-bottom-color: #A29BFE; }
+
+.status-badge {
+  display: inline-block;
+  font-family: 'Orbitron', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.65rem;
+  border-radius: 2rem;
+  border: 1px solid rgba(162,155,254,0.3);
+  color: #A29BFE;
+  background: rgba(108,92,231,0.1);
+  margin-bottom: 1rem;
+}
+
+/* =============================================
+   CV SECTION
+   ============================================= */
+
+.cv-action-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 1.1rem;
+  border-radius: 2rem;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.cv-download {
+  background: rgba(232,138,90,0.12);
+  border: 1px solid rgba(232,138,90,0.35);
+  color: #E88A5A;
+}
+.cv-download:hover {
+  background: rgba(232,138,90,0.22);
+  border-color: #E88A5A;
+}
+
+.cv-open {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: var(--text-muted);
+}
+.cv-open:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.3);
+  color: #fff;
+}
+
+.cv-wrap {
+  border: 1px solid rgba(225, 112, 85, 0.18);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  height: calc(100dvh - 200px);
+  min-height: 400px;
+}
+
+.cv-wrap iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+.cv-fallback {
+  display: none;
+  padding: 2rem;
+  text-align: center;
+}
+
+/* =============================================
+   CONTACT SECTION
+   ============================================= */
+
+.contact-card {
+  background: rgba(0, 206, 201, 0.04);
+  border: 1px solid rgba(0, 206, 201, 0.18);
+  border-radius: 1.25rem;
+  padding: 2.5rem;
+  text-align: center;
+  max-width: 460px;
+  margin: 0 auto;
+}
+
+.contact-email {
+  display: inline-block;
+  margin-top: 1rem;
+  font-family: 'Space Mono', 'Courier New', monospace;
+  font-size: clamp(0.85rem, 2.5vw, 1.05rem);
+  color: #00CEC9;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(0,206,201,0.3);
+  transition: border-color 0.2s, text-shadow 0.2s;
+}
+
+.contact-email:hover {
+  border-bottom-color: #00CEC9;
+  text-shadow: 0 0 14px rgba(0,206,201,0.5);
+}
+
+/* =============================================
+   MOBILE NAV STRIP
+   ============================================= */
+
+.mobile-nav-strip {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  display: none;
+  background: rgba(0, 4, 15, 0.92);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(255,255,255,0.07);
+  padding: 0.4rem 0 calc(0.4rem + env(safe-area-inset-bottom));
+  z-index: 20;
+}
+
+@media (max-width: 768px) {
+  .mobile-nav-strip { display: flex; justify-content: space-around; }
+  .explore-hint { display: none; }
+}
+
+.mnav-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-family: 'Orbitron', monospace;
+  font-size: 0.52rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  transition: color 0.2s;
+  flex: 1;
+  -webkit-tap-highlight-color: transparent;
+}
+.mnav-btn:active { opacity: 0.7; }
+
+.mnav-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.mnav-btn:active .mnav-dot { transform: scale(1.3); }
+
+.mnav-btn.about    .mnav-dot { background: #FFB020; box-shadow: 0 0 6px rgba(255,176,32,.6); }  /* star */
+.mnav-btn.contact  .mnav-dot { background: #48C8E0; box-shadow: 0 0 6px rgba(72,200,224,.6); }  /* Earth */
+.mnav-btn.cv       .mnav-dot { background: #E88A5A; box-shadow: 0 0 6px rgba(232,138,90,.6); }  /* Mars */
+.mnav-btn.research .mnav-dot { background: #E8B860; box-shadow: 0 0 6px rgba(232,184,96,.6); }  /* Jupiter */
