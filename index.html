@@ -37,59 +37,40 @@
       <div class="tagline">Astrophysicist · Incoming MIT PhD Student · Exoplanets &amp; Stellar Evolution</div>
     </div>
 
-    <!-- System -->
-    <div class="system-container" role="navigation" aria-label="Sections">
+    <!-- Single canvas renders star, orbits, and planets -->
+    <canvas id="solar-canvas" aria-label="Solar system — click a body to open its section"></canvas>
 
-      <!-- Central star → About -->
-      <div class="star-body" role="button" tabindex="0"
-           aria-label="About — click to open"
-           onclick="openPanel('about',this)"
-           onkeydown="if(event.key==='Enter'||event.key===' ')openPanel('about',this)">
-        <div class="star-surface" aria-hidden="true"></div>
-        <div class="star-label" aria-hidden="true">About</div>
-      </div>
-
-      <!-- Orbit 1: Contact (Earth — innermost rocky planet) -->
-      <div class="orbit orbit-1" aria-hidden="true">
-        <div class="planet-wrap"
-             role="button" tabindex="0"
-             aria-label="Contact — click to open"
-             onclick="openPanel('contact',this)"
-             onkeydown="if(event.key==='Enter'||event.key===' ')openPanel('contact',this)">
-          <div class="planet planet-contact"></div>
-          <div class="planet-label">Contact</div>
-        </div>
-      </div>
-
-      <!-- Orbit 2: CV (Mars — second rocky planet) -->
-      <div class="orbit orbit-2" aria-hidden="true">
-        <div class="planet-wrap"
-             role="button" tabindex="0"
-             aria-label="CV — click to open"
-             onclick="openPanel('cv',this)"
-             onkeydown="if(event.key==='Enter'||event.key===' ')openPanel('cv',this)">
-          <div class="planet planet-cv"></div>
-          <div class="planet-label">CV</div>
-        </div>
-      </div>
-
-      <!-- Orbit 3: Research (Jupiter — gas giant, beyond the asteroid belt) -->
-      <div class="orbit orbit-3" aria-hidden="true">
-        <div class="planet-wrap"
-             role="button" tabindex="0"
-             aria-label="Research — click to open"
-             onclick="openPanel('research',this)"
-             onkeydown="if(event.key==='Enter'||event.key===' ')openPanel('research',this)">
-          <div class="planet planet-research"></div>
-          <div class="planet-label">Research</div>
-        </div>
-      </div>
-
-    </div><!-- /system-container -->
-
-    <p class="explore-hint" aria-hidden="true">click a planet to explore</p>
+    <p class="explore-hint" aria-hidden="true">click a planet · drag to tilt</p>
 
   </div><!-- /solar-system-view -->
+
+  <!-- ── Lightcurve trigger (visible when near edge-on) ── -->
+  <button id="lc-btn" onclick="openLightcurve()" aria-label="See transit lightcurve">
+    ↗&thinsp;Lightcurve
+  </button>
+
+  <!-- ── Lightcurve panel ──────────────────────── -->
+  <div id="lc-panel" aria-label="Transit lightcurve" role="dialog">
+    <div class="lc-header">
+      <div>
+        <div class="lc-title">Transit Lightcurve</div>
+        <div class="lc-subtitle">mock photometry · edge-on view</div>
+      </div>
+      <button class="lc-close" onclick="closeLightcurve()" aria-label="Close">✕</button>
+    </div>
+    <canvas id="lc-canvas"></canvas>
+    <div class="lc-legend">
+      <div class="lc-legend-item">
+        <div class="lc-legend-dot" style="background:#48C8E0"></div>Contact
+      </div>
+      <div class="lc-legend-item">
+        <div class="lc-legend-dot" style="background:#E88A5A"></div>CV
+      </div>
+      <div class="lc-legend-item">
+        <div class="lc-legend-dot" style="background:#E8B860"></div>Research
+      </div>
+    </div>
+  </div>
 
   <!-- ── Section Panel ─────────────────────── -->
   <div id="panel" role="dialog" aria-modal="true" aria-label="Section content">
