@@ -339,12 +339,24 @@ function renderContact(el) {
     const img = sCtx.createImageData(w, h);
     const D   = img.data;
 
+    // Sun spin-axis correction:
+    // The orbital angular momentum in screen space is L = (0, -sinT, cosT).
+    // We want the star's spin axis to match L, so we rotate each screen-space
+    // normal by rotateX(-(90°+tilt)) — the unique rotation that maps L → Y-axis,
+    // which is what the current lat/lon formula treats as the "polar axis".
+    //   ny_body = -dyN·sinT + dzN·cosT   (mapped latitude parameter)
+    //   nz_body = -dyN·cosT - dzN·sinT   (mapped longitude reference)
+    const tR_sun = tiltX * Math.PI / 180;
+    const sinT   = Math.sin(tR_sun);
+    const cosT   = Math.cos(tR_sun);
+
     for (let py = 0; py < h; py++) {
       const dyN = (py - cy) * iR;
       const dy2 = dyN * dyN;
       if (dy2 >= 1.0) continue;
 
-      // Latitude is constant per row — hoist asin out of inner loop
+      // Latitude is constant per row for planets — hoist asin out of inner loop.
+      // (Sun recomputes per-pixel since its latitude depends on dzN after axis correction.)
       const lat = Math.asin(Math.max(-1.0, Math.min(1.0, dyN)));
       const v   = lat / Math.PI + 0.5;
 
@@ -366,10 +378,21 @@ function renderContact(el) {
           light = AMB + diff * (1.0 - AMB);
         }
 
-        const lon = Math.atan2(dxN, dzN) + b.rot;
-        const u   = ((lon / TWO_PI) % 1 + 1) % 1;
+        // UV coordinates — Sun uses tilt-corrected body-frame normals
+        let u, vTex;
+        if (b.type === 3) {
+          const nyB  = -dyN * sinT + dzN * cosT;
+          const nzB  = -dyN * cosT - dzN * sinT;
+          vTex       = Math.asin(Math.max(-1.0, Math.min(1.0, nyB))) / Math.PI + 0.5;
+          const lon  = Math.atan2(dxN, nzB) - b.rot;
+          u = ((lon / TWO_PI) % 1 + 1) % 1;
+        } else {
+          vTex       = v;
+          const lon  = Math.atan2(dxN, dzN) + b.rot;
+          u = ((lon / TWO_PI) % 1 + 1) % 1;
+        }
 
-        const [tr, tg, tb] = texSample(b.type, u, v);
+        const [tr, tg, tb] = texSample(b.type, u, vTex);
 
         const idx  = (py * w + px) << 2;
         D[idx]     = Math.min(255, tr * light + spec * 255) | 0;
