@@ -182,7 +182,7 @@ function renderContact(el) {
     <h1 class="section-h1">Contact</h1>
     <div class="contact-card">
       <p style="color:var(--text-muted);font-size:0.88rem">You can reach me at</p>
-      <a href="mailto:rnarayan4@wisc.edu" class="contact-email">rnarayan4 [at] wisc [dot] edu</a>
+      <a href="mailto:ritviksn@mit.edu" class="contact-email">ritviksn [at] mit [dot] edu</a>
       <div style="margin-top:2rem;display:flex;justify-content:center;gap:1rem">
         <a href="https://www.linkedin.com/in/ritviksainarayan/" target="_blank" rel="noopener" class="social-icon" title="LinkedIn"><i class="bi bi-linkedin"></i></a>
         <a href="https://github.com/ritviksainarayan" target="_blank" rel="noopener" class="social-icon" title="GitHub"><i class="bi bi-github"></i></a>
