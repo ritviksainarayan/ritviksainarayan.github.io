@@ -127,7 +127,7 @@ function renderAbout(el) {
         </div>
       </div>
       <div class="about-bio">
-        <p>I am an incoming PhD student at <a href="https://physics.mit.edu/" target="_blank" rel="noopener">MIT</a> working on exoplanet and stellar astronomy, having double-majored in Astrophysics and Economics at the <a href="https://www.astro.wisc.edu/" target="_blank" rel="noopener">University of Wisconsin–Madison</a>.</p>
+        <p>I am an first-year PhD student at <a href="https://physics.mit.edu/" target="_blank" rel="noopener">MIT</a> working on exoplanet dynamics, having double-majored in Astrophysics and Economics at the <a href="https://www.astro.wisc.edu/" target="_blank" rel="noopener">University of Wisconsin–Madison</a>.</p>
         <p>I like thinking about the evolution of stars and exoplanets, from both observational and theoretical lenses. I also enjoy the data science and computational aspects of modern astronomy, and care about how to effectively communicate science results with meaningful visualizations.</p>
         <p>In my free time, I enjoy working out, binge-watching copious amounts of TV, and mindlessly supporting a Formula 1 team (<em>Forza Ferrari!</em>).</p>
       </div>
