@@ -27,8 +27,8 @@ window.SKY = window.SKY || {};
     return { ctx, w, h };
   }
 
-  function drawStar(ctx, x, y, mag, bv, scale, glow) {
-    const r = Math.max(0.55, (6.3 - mag) * 0.42 * scale);
+  function drawStar(ctx, x, y, mag, bv, scale, glow, minR = 0.55) {
+    const r = Math.max(minR, (6.3 - mag) * 0.42 * scale);
     const col = starColor(bv);
     if (glow && mag < 2.6) {
       const g = ctx.createRadialGradient(x, y, 0, x, y, r * 4);
@@ -66,21 +66,7 @@ window.SKY = window.SKY || {};
     const figureStars = new Set();
     for (const l of o.lines || []) for (const i of CONS[l.id].stars) figureStars.add(i);
 
-    if (o.field) {
-      for (let i = 0; i < STARS.length; i++) {
-        const s = STARS[i];
-        if (s[2] > lim && !figureStars.has(i)) continue;
-        if (A.sep(s[0], s[1], o.ra0, o.dec0) > o.fov * 2.1) continue; // cover the canvas corners
-        const p = proj(s[0], s[1]);
-        drawStar(ctx, p.x, p.y, s[2], s[3], starScale, !o.dim);
-      }
-    } else {
-      for (const i of figureStars) {
-        const s = STARS[i]; const p = proj(s[0], s[1]);
-        drawStar(ctx, p.x, p.y, s[2], s[3], starScale, !o.dim);
-      }
-    }
-
+    // Lines go underneath so the stars at each vertex stay visible.
     for (const l of o.lines || []) {
       if (l.hidden) continue;
       ctx.strokeStyle = l.color || 'rgba(72,200,224,0.6)';
@@ -92,6 +78,32 @@ window.SKY = window.SKY || {};
       }
     }
 
+    // Figure stars never vanish: a floor on their size keeps faint constellations legible.
+    // When the outline is showing in a busy field, the vertex stars get bigger plus a ring so
+    // every line visibly ends on a star.
+    const revealing = o.field && (o.lines || []).some(l => !l.hidden);
+    const figureMin = revealing ? 1.9 : o.field ? 1.0 : 1.4;
+    if (o.field) {
+      for (let i = 0; i < STARS.length; i++) {
+        const s = STARS[i];
+        const isFig = figureStars.has(i);
+        if (s[2] > lim && !isFig) continue;
+        if (A.sep(s[0], s[1], o.ra0, o.dec0) > o.fov * 2.1) continue; // cover the canvas corners
+        const p = proj(s[0], s[1]);
+        drawStar(ctx, p.x, p.y, s[2], s[3], starScale, !o.dim, isFig ? figureMin : 0.55);
+      }
+    } else {
+      for (const i of figureStars) {
+        const s = STARS[i]; const p = proj(s[0], s[1]);
+        drawStar(ctx, p.x, p.y, s[2], s[3], starScale, !o.dim, figureMin);
+      }
+    }
+
+    if (revealing) {
+      ctx.strokeStyle = 'rgba(255,176,32,0.55)'; ctx.lineWidth = 1;
+      for (const i of figureStars) { const st = STARS[i]; const p = proj(st[0], st[1]); ctx.beginPath(); ctx.arc(p.x, p.y, 5, 0, Math.PI * 2); ctx.stroke(); }
+    }
+
     if (o.labels) {
       ctx.font = `${Math.round(Math.max(10, 11 * Math.min(1.3, R / 220)))}px 'Source Serif 4', Georgia, serif`;
       ctx.fillStyle = 'rgba(232,244,248,0.88)'; ctx.textBaseline = 'middle';
@@ -101,13 +113,19 @@ window.SKY = window.SKY || {};
         const s = STARS[i];
         if (!isProperName(s[4]) || s[2] > (o.labelMag == null ? 3.2 : o.labelMag)) continue;
         const p = proj(s[0], s[1]); const tw = ctx.measureText(s[4]).width;
-        // Try right of the star, then left, then below; skip if everything collides.
+        // Try right-above, then right-below, then left-above; each gets a leader tick to its star
+        // so a displaced label can never be read as belonging to a neighbour.
         const spots = [
-          { x: p.x + 7, y: p.y - 8, align: 'left' }, { x: p.x - 7, y: p.y - 8, align: 'right' }, { x: p.x + 7, y: p.y + 9, align: 'left' }];
+          { x: p.x + 9, y: p.y - 9, align: 'left', lx: p.x + 3, ly: p.y - 3, tx: p.x + 8, ty: p.y - 8 },
+          { x: p.x + 9, y: p.y + 10, align: 'left', lx: p.x + 3, ly: p.y + 3, tx: p.x + 8, ty: p.y + 8 },
+          { x: p.x - 9, y: p.y - 9, align: 'right', lx: p.x - 3, ly: p.y - 3, tx: p.x - 8, ty: p.y - 8 }];
         for (const sp of spots) {
           const box = { x0: sp.align === 'left' ? sp.x : sp.x - tw, x1: sp.align === 'left' ? sp.x + tw : sp.x, y0: sp.y - 7, y1: sp.y + 7 };
           if (collides(box)) continue;
-          placed.push(box); ctx.textAlign = sp.align; ctx.fillText(s[4], sp.x, sp.y); break;
+          placed.push(box);
+          ctx.strokeStyle = 'rgba(232,244,248,0.5)'; ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.moveTo(sp.lx, sp.ly); ctx.lineTo(sp.tx, sp.ty); ctx.stroke();
+          ctx.textAlign = sp.align; ctx.fillText(s[4], sp.x, sp.y); break;
         }
       }
       ctx.textAlign = 'left';

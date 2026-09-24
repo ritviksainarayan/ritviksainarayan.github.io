@@ -55,6 +55,7 @@
     window.scrollTo(0, 0);
     if (parts[0] === 'learn' && parts[1] === 'c') return renderCardPage(parts[2]);
     if (parts[0] === 'train') return session ? renderStep() : renderTrainSetup();
+    if (parts[0] === 'test') return test ? renderTestQ() : renderTestSetup();
     if (parts[0] === 'sky') return renderSky();
     if (parts[0] === 'progress') return renderProgress();
     return renderLearn();
@@ -186,7 +187,7 @@
     view.innerHTML = `
       <section class="setup">
         <h1>flashcards</h1>
-        <p class="muted">${due ? `<b>${due}</b> due for review` : 'nothing due for review'} · <b>${Math.min(fresh.length, s.newPerSession)}</b> new${fresh.length ? ` (next up: ${fresh.slice(0, 3).map(id => esc(CONS[id].name)).join(', ')}${fresh.length > 3 ? '…' : ''})` : ''}</p>
+        <p class="muted">${SRS.state.focus.length ? `<b>${SRS.state.focus.length}</b> flagged by your last test (served first) · ` : ''}${due ? `<b>${due}</b> due for review` : 'nothing due for review'} · <b>${Math.min(fresh.length, s.newPerSession)}</b> new${fresh.length ? ` (next up: ${fresh.slice(0, 3).map(id => esc(CONS[id].name)).join(', ')}${fresh.length > 3 ? '…' : ''})` : ''}</p>
         <div class="setup-grid">
           <label>new cards per session <span id="npsv">${s.newPerSession}</span>
             <input type="range" id="nps" min="0" max="10" value="${s.newPerSession}"></label>
@@ -237,21 +238,27 @@
   function makeQuestion(id, cfg) {
     const c = CONS[id];
     const q = { id, cfg, rot: cfg.rot ? A.rand(0, 360) : 0, magLimit: SRS.state.settings.magLimit, ra0: c.ra, dec0: c.dec };
+    // Sprawling constellations (Hydra, Eridanus, Serpens…) cannot fit a realistic field of view:
+    // anchor those on their brightest star, which is what you would find first in the real sky.
+    const anchorOnBrightest = () => { const b = c.stars.reduce((m, i) => STARS[i][2] < STARS[m][2] ? i : m, c.stars[0]); q.ra0 = STARS[b][0]; q.dec0 = STARS[b][1]; };
     if (cfg.find) {
-      q.fov = Math.max(25, Math.min(70, c.radius * 1.6 + 14));
+      q.fov = Math.max(25, Math.min(50, c.radius * 1.6 + 14));
+      if (c.radius > 0.7 * q.fov) anchorOnBrightest();
       const ang = A.rand(0, 360), dist = A.rand(0, q.fov * 0.4) * A.D2R;
-      const dec0 = c.dec * A.D2R + dist * Math.cos(ang * A.D2R);
-      const ra0 = c.ra + (dist * Math.sin(ang * A.D2R)) / Math.max(0.2, Math.cos(dec0)) * A.R2D;
+      const dec0 = q.dec0 * A.D2R + dist * Math.cos(ang * A.D2R);
+      const ra0 = q.ra0 + (dist * Math.sin(ang * A.D2R)) / Math.max(0.2, Math.cos(dec0)) * A.R2D;
       q.ra0 = ((ra0 % 360) + 360) % 360; q.dec0 = Math.max(-89, Math.min(89, dec0 * A.R2D));
+      q.rot = A.rand(0, 360);
     } else {
       q.fov = Math.max(c.radius * 1.25, 5) * (cfg.rot ? A.rand(0.95, 1.35) : 1);
+      if (cfg.field && q.fov > 45) { q.fov = 45; if (c.radius > 32) anchorOnBrightest(); }
     }
     return q;
   }
   function drawQuestion(q, reveal) {
     const cv = $('#qc');
     const lines = reveal ? [{ id: q.id, color: '#FFB020', width: 2 }] : [{ id: q.id, hidden: !q.cfg.lines }];
-    return R.drawChart(cv, { ra0: q.ra0, dec0: q.dec0, fov: q.fov, rot: q.rot, field: q.cfg.field, lines, labels: !!reveal, labelMag: 2.8, magLimit: q.magLimit });
+    return R.drawChart(cv, { ra0: q.ra0, dec0: q.dec0, fov: q.fov, rot: q.rot, field: q.cfg.field, lines, labels: !!reveal, labelMag: q.fov > 30 ? 2.3 : 2.8, magLimit: q.magLimit });
   }
   function diffBarHTML() {
     const d = SRS.state.settings.diff;
@@ -333,6 +340,158 @@
     $('#again').addEventListener('click', () => startSession());
   }
 
+
+  // ── Test: objective recall exam ──────────────────────────────────
+  let test = null;
+  const norm = x => String(x || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z]/g, '');
+  function lev(a, b) {
+    const m = a.length, n = b.length; if (!m) return n; if (!n) return m;
+    let prev = Array.from({ length: n + 1 }, (_, j) => j);
+    for (let i = 1; i <= m; i++) { const cur = [i]; for (let j = 1; j <= n; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); prev = cur; }
+    return prev[n];
+  }
+  function nameMatches(input, id) {
+    const q = norm(input); if (!q) return false;
+    return [norm(CONS[id].name), norm(id), norm(CONS[id].gen)].some(t => t === q || (t.length >= 6 ? lev(t, q) <= 2 : lev(t, q) <= 1));
+  }
+  const TEST_MODES = {
+    ladder: { label: 'match my ladder (each card at the stage it has reached)' },
+    stars: { label: 'stars only, rotated · type the name' },
+    field: { label: 'rotated, with field stars · type the name' },
+    find: { label: 'wide field · find it' },
+  };
+  const KIND_TEXT = { mc: 'pick the name', type: 'type the name from memory', find: 'find it in a wide field' };
+  const FAIL_TEXT = { mc: 'mixed it up', type: "couldn't recall the name", find: "couldn't find it in the field" };
+
+  function renderTestSetup() {
+    const s = SRS.state.settings, studied = SRS.studied(), last = SRS.state.tests.slice(-1)[0];
+    const tonightIds = ORDER.filter(isUpTonight);
+    const scope = s.testScope || 'studied', mode = s.testMode || 'ladder', len = s.testLen || 15;
+    view.innerHTML = `<section class="setup">
+      <h1>test yourself</h1>
+      <p class="muted">No flipping, no self-grading. You name constellations from memory, pick them out of look-alikes, and find them in a wide field. Whatever you miss gets flagged and served first in training.</p>
+      <div class="setup-grid">
+        <label>what to test
+          <select id="tscope">
+            <option value="studied" ${scope === 'studied' ? 'selected' : ''}>everything I've studied (${studied.length})</option>
+            <option value="tonight" ${scope === 'tonight' ? 'selected' : ''}>what's up tonight from ${esc(loc().place)} (${tonightIds.length})</option>
+            <option value="all" ${scope === 'all' ? 'selected' : ''}>all 88</option>
+          </select></label>
+        <label>how hard
+          <select id="tmode">${Object.keys(TEST_MODES).map(k => `<option value="${k}" ${k === mode ? 'selected' : ''}>${esc(TEST_MODES[k].label)}</option>`).join('')}</select></label>
+        <label>how many questions
+          <select id="tlen">${[10, 15, 20, 30, 88].map(n => `<option value="${n}" ${n === len ? 'selected' : ''}>${n === 88 ? 'all of them' : n}</option>`).join('')}</select></label>
+      </div>
+      <button class="btn primary big" id="tstart" ${!studied.length && scope === 'studied' ? 'disabled' : ''}>start test</button>
+      ${!studied.length && scope === 'studied' ? '<p class="muted small">nothing studied yet: pick "all 88" or train first.</p>' : ''}
+      ${last ? `<div class="stages"><h4>last test</h4><p>${Math.round(100 * last.correct / last.n)}% · ${last.correct} of ${last.n} on ${new Date(last.at).toLocaleDateString()}. ${last.failed.length ? `Flagged: ${last.failed.map(id => `<a href="#learn/c/${id}">${esc(CONS[id].name)}</a>`).join(', ')}.` : 'Nothing flagged.'}</p></div>` : ''}
+    </section>`;
+    $('#tscope').addEventListener('change', e => { s.testScope = e.target.value; SRS.save(); renderTestSetup(); });
+    $('#tmode').addEventListener('change', e => { s.testMode = e.target.value; SRS.save(); });
+    $('#tlen').addEventListener('change', e => { s.testLen = +e.target.value; SRS.save(); });
+    $('#tstart').addEventListener('click', startTest);
+  }
+  function startTest() {
+    const s = SRS.state.settings; const scope = s.testScope || 'studied', len = s.testLen || 15;
+    let ids = scope === 'all' ? ORDER.slice() : scope === 'tonight' ? ORDER.filter(isUpTonight) : SRS.studied();
+    if (!ids.length) ids = ORDER.slice();
+    // Weakest first has the most diagnostic value: low ladder, overdue, previously flagged.
+    const score = id => (SRS.state.focus.includes(id) ? -10 : 0) + SRS.get(id).level - Math.min(3, Math.max(0, (Date.now() - SRS.get(id).due) / 86400000)) + Math.random() * 2;
+    ids = ids.sort((a, b) => score(a) - score(b)).slice(0, Math.min(len, ids.length));
+    test = { ids: A.shuffle(ids), pos: 0, results: [], mode: s.testMode || 'ladder' };
+    if (location.hash !== '#test') location.hash = '#test'; else renderTestQ();
+  }
+  function testCfg(id) {
+    const lvl = SRS.get(id).level, m = test.mode;
+    if (m === 'stars') return { kind: 'type', lines: false, rot: true, field: false, find: false, stage: 3 };
+    if (m === 'field') return { kind: 'type', lines: false, rot: true, field: true, find: false, stage: 4 };
+    if (m === 'find') return { kind: 'find', lines: false, rot: true, field: true, find: true, stage: 5 };
+    if (lvl <= 1) return { kind: 'mc', lines: true, rot: false, field: false, find: false, stage: 1 };
+    if (lvl === 2) return { kind: 'mc', lines: false, rot: false, field: false, find: false, stage: 2 };
+    if (lvl === 3) return { kind: 'type', lines: false, rot: true, field: false, find: false, stage: 3 };
+    if (lvl === 4) return { kind: 'type', lines: false, rot: true, field: true, find: false, stage: 4 };
+    return { kind: 'find', lines: false, rot: true, field: true, find: true, stage: 5 };
+  }
+  function renderTestQ() {
+    window.scrollTo(0, 0);
+    if (!test) return renderTestSetup();
+    if (test.pos >= test.ids.length) return renderTestResults();
+    const id = test.ids[test.pos], cfg = testCfg(id), q = makeQuestion(id, cfg); q.kind = cfg.kind; test.current = q;
+    if (cfg.kind === 'mc') q.options = A.shuffle([id, ...SRS.foils(id, 3)]);
+    const n = test.ids.length, i = test.pos + 1;
+    view.innerHTML = `<section class="train">
+      <div class="q-top"><span>${i} / ${n}</span><span class="q-stage">test · ${esc(KIND_TEXT[cfg.kind])} · stage ${cfg.stage}</span><span>${test.results.filter(r => r.ok).length} ✓</span></div>
+      <div class="q-bar"><i style="width:${100 * test.pos / n}%"></i></div>
+      <div class="q-canvas-wrap ${cfg.find ? 'find' : ''}"><canvas id="qc"></canvas>
+        <div class="q-prompt" id="qprompt">${cfg.find ? `tap <b>${esc(CONS[id].name)}</b>` : 'what constellation is this?'}</div></div>
+      ${cfg.kind === 'mc' ? `<div class="q-options">${q.options.map((o, k) => `<button data-pick="${o}"><kbd>${'zxcv'[k]}</kbd><span>${esc(CONS[o].name)}</span><small>${esc(meaning(o))}</small></button>`).join('')}</div>` : ''}
+      ${cfg.kind === 'type' ? `<form class="typed" id="tform"><input id="tin" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="name or abbreviation…" aria-label="constellation name"><button class="btn primary" type="submit">check <kbd>enter</kbd></button><button class="btn" type="button" id="tdunno">don't know</button></form>` : ''}
+      ${cfg.kind === 'find' ? '<p class="muted center">tap where it is. stars fainter than your sky setting are hidden.</p>' : ''}
+      <div class="q-feedback" id="qfb" hidden></div>
+    </section>`;
+    const chart = drawQuestion(q);
+    if (cfg.kind === 'mc') {
+      $$('[data-pick]').forEach(b => b.addEventListener('click', () => answerTest(q, b.dataset.pick === id, { picked: b.dataset.pick })));
+      keyHandler = e => { const k = 'zxcv'.indexOf(e.key.toLowerCase()); const k2 = '1234'.indexOf(e.key); const idx = k >= 0 ? k : k2; if (idx >= 0 && !q.done) $$('[data-pick]')[idx].click(); };
+    } else if (cfg.kind === 'type') {
+      $('#tform').addEventListener('submit', e => { e.preventDefault(); const v = $('#tin').value; if (!v.trim()) return; answerTest(q, nameMatches(v, id), { typed: v }); });
+      $('#tdunno').addEventListener('click', () => answerTest(q, false, { typed: '' }));
+      $('#tin').focus(); keyHandler = null;
+    } else {
+      keyHandler = null;
+      $('#qc').addEventListener('click', e => {
+        const r = e.currentTarget.getBoundingClientRect(); const sky = chart.toSky(e.clientX - r.left, e.clientY - r.top); q.tap = sky;
+        let best = null, bd = 1e9;
+        for (const cid in CONS) {
+          if (A.sep(CONS[cid].ra, CONS[cid].dec, q.ra0, q.dec0) > q.fov * 1.4 + CONS[cid].radius) continue;
+          for (const si of CONS[cid].stars) { const st = STARS[si]; const d = A.sep(st[0], st[1], sky.ra, sky.dec); if (d < bd) { bd = d; best = cid; } }
+        }
+        answerTest(q, best === id && bd <= Math.max(4, q.fov * 0.12), { picked: best });
+      }, { once: true });
+    }
+  }
+  function answerTest(q, ok, info) {
+    if (q.done) return; q.done = true;
+    const id = q.id;
+    test.results.push({ id, ok, kind: q.kind, picked: info.picked, typed: info.typed, stage: q.cfg.stage });
+    SRS.answer(id, ok, q.cfg.stage);
+    if (!ok && q.kind === 'mc' && info.picked) SRS.confuse(id, info.picked);
+    // reveal: outline in gold, plus tap marker for find questions
+    R.drawChart($('#qc'), { ra0: q.ra0, dec0: q.dec0, fov: q.fov, rot: q.rot, field: q.cfg.field, lines: [{ id, color: ok ? 'rgba(120,230,160,0.9)' : '#FFB020', width: 2 }], labels: true, labelMag: 2.8, magLimit: q.magLimit, marker: q.tap ? { ra: q.tap.ra, dec: q.tap.dec, color: ok ? 'rgba(120,230,160,0.9)' : '#ff6b6b' } : null });
+    $$('[data-pick]').forEach(b => { b.disabled = true; if (b.dataset.pick === id) b.classList.add('ok'); else if (b.dataset.pick === info.picked) b.classList.add('bad'); });
+    if ($('#tin')) { $('#tin').disabled = true; $$('#tform button').forEach(b => b.disabled = true); }
+    $('#qprompt').innerHTML = `<b>${esc(CONS[id].name)}</b> · ${esc(meaning(id))}`;
+    const fb = $('#qfb'); fb.hidden = false;
+    const why = ok ? '' : q.kind === 'mc' && info.picked ? ` · you picked ${esc(CONS[info.picked].name)}` : q.kind === 'find' && info.picked && info.picked !== id ? ` · you tapped near ${esc(CONS[info.picked].name)}` : q.kind === 'type' && info.typed ? ` · you typed “${esc(info.typed)}”` : '';
+    fb.innerHTML = `<div class="q-actions"><span class="grade-note ${ok ? 'ok' : 'bad'}">${ok ? '✓' : '✗'} ${esc(CONS[id].name)}${why}</span><button class="btn primary" id="tnext">next <kbd>space</kbd></button></div>`;
+    $('#tnext').addEventListener('click', nextTest); $('#tnext').focus();
+    keyHandler = e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); nextTest(); } };
+  }
+  function nextTest() { test.pos++; renderTestQ(); }
+  function renderTestResults() {
+    keyHandler = null;
+    const res = test.results, n = res.length, correct = res.filter(r => r.ok).length;
+    const failed = res.filter(r => !r.ok), passed = res.filter(r => r.ok);
+    SRS.recordTest({ at: Date.now(), n, correct, failed: failed.map(r => r.id) });
+    const byKind = {}; for (const r of failed) byKind[r.kind] = (byKind[r.kind] || 0) + 1;
+    const kinds = Object.keys(byKind).sort((a, b) => byKind[b] - byKind[a]);
+    const verdict = !failed.length ? 'Clean sweep. Push the difficulty up next time.' :
+      kinds[0] === 'type' ? 'Recognition is ahead of recall: you know the shapes but the names are not coming. Train these with lines off and say the name before you flip.' :
+      kinds[0] === 'find' ? 'You know the shapes in isolation but lose them among neighbours. Train these with field stars and wide field on.' :
+      'Look-alikes are tripping you up. Open the details on each flagged card and read the "how it\'s formed" cue for what makes it different.';
+    view.innerHTML = `<section class="summary">
+      <h1>test results</h1>
+      <div class="tiles"><div><b>${Math.round(100 * correct / n)}%</b><span>score</span></div><div><b>${correct}</b><span>right</span></div><div><b>${failed.length}</b><span>to train</span></div><div><b>${SRS.state.tests.length}</b><span>tests taken</span></div></div>
+      <p class="verdict">${esc(verdict)}</p>
+      ${failed.length ? `<h4>needs training</h4><ul class="result-list">${failed.map(r => `<li><a href="#learn/c/${r.id}"><b>${esc(CONS[r.id].name)}</b></a><span class="muted">${esc(FAIL_TEXT[r.kind])}${r.kind === 'mc' && r.picked ? ` with ${esc(CONS[r.picked].name)}` : ''}${r.kind === 'find' && r.picked && r.picked !== r.id ? `, tapped ${esc(CONS[r.picked].name)}` : ''} · stage ${r.stage}</span>${masteryDots(r.id)}</li>`).join('')}</ul>` : ''}
+      ${passed.length ? `<h4>solid</h4><div class="chips">${passed.map(r => `<a class="chip" href="#learn/c/${r.id}">${esc(CONS[r.id].name)} <small>stage ${r.stage}</small></a>`).join('')}</div>` : ''}
+      <div class="q-actions">${failed.length ? '<button class="btn primary big" id="trainfail">train what I missed</button>' : ''}<button class="btn" id="tagain">another test</button></div>
+    </section>`;
+    test = null;
+    if ($('#trainfail')) $('#trainfail').addEventListener('click', () => startSession());
+    $('#tagain').addEventListener('click', () => { location.hash = '#test'; renderTestSetup(); });
+  }
+
   // ── Sky now ──────────────────────────────────────────────────────
   const skyState = { offsetH: 0, lines: true, labels: true, onlyLearned: false, highlight: null };
   let skyTick = null;
@@ -412,6 +571,7 @@
     view.innerHTML = `<section class="progress">
       <h1>progress</h1>
       <div class="tiles"><div><b>${studied}</b><span>studied of 88</span></div><div><b>${mastered}</b><span>mastered</span></div><div><b>${due}</b><span>due now</span></div><div><b>${acc}%</b><span>got it</span></div><div><b>${dstreak}</b><span>day streak</span></div><div><b>${st.answered}</b><span>cards rated</span></div></div>
+      ${(() => { const t = SRS.state.tests.slice(-1)[0]; return t ? `<h4>last test</h4><p class="muted">${Math.round(100 * t.correct / t.n)}% (${t.correct} of ${t.n}) on ${new Date(t.at).toLocaleDateString()}${SRS.state.focus.length ? ` · still to fix: ${SRS.state.focus.map(id => `<a href="#learn/c/${id}">${esc(CONS[id].name)}</a>`).join(', ')}` : ' · nothing left flagged'}</p>` : ''; })()}
       <h4>all 88</h4>
       <div class="prog-grid">${ORDER.map(id => { const it = SRS.get(id); const m = SRS.mastery(id); const dueIn = it.level ? Math.ceil((it.due - Date.now()) / 86400000) : null; return `<a class="prog ${m === 6 ? 'gold' : m ? 'on' : ''}" href="#learn/c/${id}" title="${esc(LEVEL_NAMES[m])}${dueIn != null ? ' · ' + (dueIn <= 0 ? 'due now' : 'due in ' + dueIn + 'd') : ''}"><span>${esc(CONS[id].name)}</span>${masteryDots(id)}</a>`; }).join('')}</div>
       <div class="tools">

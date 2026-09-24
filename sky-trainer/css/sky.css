@@ -265,3 +265,13 @@ details.more summary:hover { color: var(--text); }
   .diff-mag { margin-left: 0; width: 100%; }
   .learn-tools select { flex: 1; }
 }
+
+/* ── Test ─────────────────────────────────────────────────────── */
+.typed { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .8rem; }
+.typed input { flex: 1; min-width: 200px; font: inherit; font-size: 1.1rem; padding: .6rem .9rem; border-radius: 999px; background: var(--surface-2); color: var(--text); border: 1px solid var(--line); }
+.typed input:focus { outline: none; border-color: var(--gold); }
+.verdict { max-width: 620px; margin: 0 auto 1rem; color: #c9d6e0; font-size: 1.05rem; }
+.result-list { list-style: none; text-align: left; max-width: 640px; margin: .3rem auto; }
+.result-list li { display: grid; grid-template-columns: auto 1fr auto; gap: .8rem; align-items: center; padding: .5rem .8rem; border-radius: 10px; border: 1px solid rgba(255, 107, 107, 0.25); background: rgba(255, 107, 107, 0.06); margin-bottom: .35rem; font-size: .95rem; }
+.result-list li .dots { margin: 0; }
+.q-feedback .q-actions { justify-content: center; align-items: center; }

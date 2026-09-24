@@ -14,7 +14,7 @@ No build step: plain HTML, CSS and JavaScript, served as static files.
 | `js/astro.js` | Projection, sidereal time, altitude/azimuth |
 | `js/render.js` | Canvas drawing: constellation charts and the all-sky dome |
 | `js/srs.js` | Spaced-repetition scheduler, stage-aware mastery ladder, session builder, localStorage |
-| `js/app.js` | Views (Learn, Train, Sky now, Progress), flashcard loop, difficulty bar, onboarding |
+| `js/app.js` | Views (learn, train, test, sky now, progress), flashcard loop, difficulty bar, test exam, onboarding |
 
 ## Linking from the homepage
 
@@ -39,4 +39,7 @@ The build script only trims and re-indexes; rerun it if you want a fainter magni
   each card's ladder stage; manual switches let you make any card harder at will.
 - Stage-aware SM-2 scheduling: a correct answer at stage s lifts the ladder to s+1; a miss drops it below the stage it
   failed at, resets the interval, and re-queues the card within the session.
+- Test mode: an objective exam with no self-grading. Typed recall (fuzzy-matched), multiple choice against adaptive
+  look-alike distractors, and wide-field find questions. Failures are flagged, dropped a stage, and served first in
+  the next training sessions until answered correctly; the results page names the weak skill (recall, look-alikes, or search).
 - Star-hopping and story hooks on each card; the live sky map ties practice to the real sky at the learner's location.

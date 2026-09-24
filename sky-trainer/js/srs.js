@@ -10,11 +10,13 @@ window.SKY = window.SKY || {};
     settings: { newPerSession: 4, magLimit: 5.0, lat: null, lon: null, place: '', tonightOnly: false, diff: { auto: true, lines: true, rot: false, field: false, find: false } },
     stats: { answered: 0, correct: 0, streak: 0, best: 0, days: {}, sessions: 0 },
     onboarded: false,
+    focus: [],      // ids a test flagged as weak; training serves these first
+    tests: [],      // { at, n, correct, failed:[ids] }
   });
   let state = load();
 
   function load() {
-    try { const raw = localStorage.getItem(KEY); if (raw) { const s = JSON.parse(raw); return Object.assign(defaults(), s, { settings: Object.assign(defaults().settings, s.settings || {}, { diff: Object.assign(defaults().settings.diff, (s.settings || {}).diff || {}) }), stats: Object.assign(defaults().stats, s.stats || {}) }); } } catch (e) { /* ignore */ }
+    try { const raw = localStorage.getItem(KEY); if (raw) { const s = JSON.parse(raw); return Object.assign(defaults(), s, { focus: s.focus || [], tests: s.tests || [], settings: Object.assign(defaults().settings, s.settings || {}, { diff: Object.assign(defaults().settings.diff, (s.settings || {}).diff || {}) }), stats: Object.assign(defaults().stats, s.stats || {}) }); } } catch (e) { /* ignore */ }
     return defaults();
   }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* ignore */ } }
@@ -43,6 +45,7 @@ window.SKY = window.SKY || {};
       it.ef = Math.min(3.0, it.ef + 0.08);
       it.level = Math.min(5, Math.max(it.level, stage + 1));
       it.due = now + it.interval * DAY * A.rand(0.9, 1.15);
+      state.focus = state.focus.filter(x => x !== id);
     } else {
       state.stats.streak = 0; it.wrong++; it.lapses++;
       it.interval = 0; it.reps = 0; it.due = now;
@@ -59,10 +62,11 @@ window.SKY = window.SKY || {};
    */
   function buildSession(visibleFilter) {
     const pool = CONTENT.order, now = Date.now();
-    let due = dueItems(now);
+    const focus = state.focus.filter(id => CONS[id]);
+    let due = focus.concat(dueItems(now).filter(id => !focus.includes(id)));
     let fresh = pool.filter(id => get(id).level === 0);
     if (visibleFilter) { const d2 = due.filter(visibleFilter), f2 = fresh.filter(visibleFilter); if (d2.length + f2.length) { due = d2; fresh = f2; } }
-    due = A.shuffle(due).slice(0, 14);
+    due = focus.concat(A.shuffle(due.filter(id => !focus.includes(id)))).slice(0, Math.max(14, focus.length));
     fresh = fresh.slice(0, state.settings.newPerSession);
     if (due.length + fresh.length < 6) {
       const extra = A.shuffle(pool.filter(id => get(id).level > 0 && !due.includes(id))).slice(0, 6 - due.length - fresh.length);
@@ -74,9 +78,37 @@ window.SKY = window.SKY || {};
     return { queue };
   }
 
+  // Record a confusion pair (wrong multiple-choice pick) so future distractors target it.
+  function confuse(id, other) {
+    if (!CONS[other] || other === id) return;
+    const a = touch(id), b = touch(other);
+    a.confusions[other] = (a.confusions[other] || 0) + 1; b.confusions[id] = (b.confusions[id] || 0) + 1; save();
+  }
+  // Distractors: your own confusions, curated look-alikes, sky neighbours, things you've studied.
+  function foils(target, n = 3) {
+    const it = get(target), t = CONS[target], cc = (CONTENT.c[target] || {}).confuse || [];
+    const cand = Object.keys(CONS).filter(id => id !== target).map(id => {
+      let w = 0.12 + 6 * (it.confusions[id] || 0) + (cc.includes(id) ? 8 : 0) + (get(id).level > 0 ? 2 : 0);
+      const d = A.sep(t.ra, t.dec, CONS[id].ra, CONS[id].dec);
+      if (d < 35) w += 4; else if (d < 60) w += 1.5;
+      if (Math.abs(CONS[id].stars.length - t.stars.length) <= 3) w += 0.8;
+      return { id, w };
+    });
+    const out = [];
+    while (out.length < n && cand.length) {
+      const total = cand.reduce((s, c) => s + c.w, 0); let r = Math.random() * total, k = 0;
+      for (; k < cand.length; k++) { r -= cand[k].w; if (r <= 0) break; }
+      out.push(cand.splice(Math.min(k, cand.length - 1), 1)[0].id);
+    }
+    return out;
+  }
+  function recordTest(result) {
+    state.tests.push(result); if (state.tests.length > 30) state.tests.shift();
+    state.focus = Array.from(new Set(result.failed.concat(state.focus))); save();
+  }
   function exportJSON() { return JSON.stringify(state, null, 1); }
   function importJSON(text) { const s = JSON.parse(text); if (!s.items) throw new Error('Not a Sky Trainer export'); state = Object.assign(defaults(), s); save(); }
   function reset() { state = defaults(); save(); }
 
-  S.srs = { get state() { return state; }, save, get, touch, studied, dueItems, isMastered, mastery, introduce, answer, buildSession, exportJSON, importJSON, reset };
+  S.srs = { get state() { return state; }, save, get, touch, studied, dueItems, isMastered, mastery, introduce, answer, buildSession, confuse, foils, recordTest, exportJSON, importJSON, reset };
 })(window.SKY);
