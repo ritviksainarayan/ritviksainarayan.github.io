@@ -588,3 +588,70 @@ a { color: inherit; }
   #lc-btn   { display: none; }
   #lc-panel { display: none; }
 }
+
+/* =============================================
+   CORNER MENU (apps dropdown, top right)
+   ============================================= */
+
+.corner-menu {
+  position: fixed;
+  top: clamp(0.9rem, 2.4vw, 1.5rem);
+  right: clamp(0.9rem, 2.4vw, 1.5rem);
+  z-index: 40;
+}
+
+.corner-btn {
+  background: rgba(3, 8, 20, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: var(--text-primary);
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  padding: 0.5rem 0.95rem;
+  border-radius: 2rem;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  transition: border-color 0.2s, background 0.2s;
+  white-space: nowrap;
+}
+.corner-btn span { display: inline-block; transition: transform 0.2s; margin-left: 0.15rem; }
+.corner-btn:hover, .corner-menu.open .corner-btn {
+  border-color: rgba(232, 184, 96, 0.6);
+  background: rgba(3, 8, 20, 0.95);
+}
+.corner-menu.open .corner-btn span { transform: rotate(180deg); }
+
+.corner-dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.5rem);
+  min-width: 15rem;
+  padding: 0.35rem;
+  background: rgba(3, 8, 20, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 0.9rem;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(14px);
+  animation: corner-in 0.16s ease-out;
+}
+.corner-dropdown[hidden] { display: none; }
+@keyframes corner-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+
+.corner-dropdown a {
+  display: block;
+  padding: 0.6rem 0.8rem;
+  border-radius: 0.6rem;
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: background 0.15s;
+}
+.corner-dropdown a:hover, .corner-dropdown a:focus-visible { background: rgba(255, 255, 255, 0.07); outline: none; }
+.corner-dropdown a b { display: block; font-family: 'Raleway', sans-serif; font-weight: 700; font-size: 0.9rem; color: var(--star-glow); }
+.corner-dropdown a span { display: block; font-size: 0.72rem; color: var(--text-muted); margin-top: 0.1rem; }
+
+@media (max-width: 640px) {
+  .corner-menu { top: 0.7rem; right: 0.7rem; }
+  .site-title { top: 3.1rem; }   /* keep the centred title clear of the corner button */
+  .corner-btn { font-size: 0.62rem; padding: 0.4rem 0.7rem; }
+  .corner-dropdown { min-width: 13rem; }
+}

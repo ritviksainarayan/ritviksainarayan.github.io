@@ -127,7 +127,7 @@ function renderAbout(el) {
         </div>
       </div>
       <div class="about-bio">
-        <p>I am a first-year PhD student at <a href="https://physics.mit.edu/" target="_blank" rel="noopener">MIT</a> and a Thomas Frank &amp; Henry W. Kendall Fellow, working on exoplanet dynamics. I double-majored in Astrophysics and Economics at the <a href="https://www.astro.wisc.edu/" target="_blank" rel="noopener">University of Wisconsin–Madison</a>.</p>
+        <p>I am an incoming PhD student at <a href="https://physics.mit.edu/" target="_blank" rel="noopener">MIT</a> working on exoplanet and stellar astronomy, having double-majored in Astrophysics and Economics at the <a href="https://www.astro.wisc.edu/" target="_blank" rel="noopener">University of Wisconsin–Madison</a>.</p>
         <p>I like thinking about the evolution of stars and exoplanets, from both observational and theoretical lenses. I also enjoy the data science and computational aspects of modern astronomy, and care about how to effectively communicate science results with meaningful visualizations.</p>
         <p>In my free time, I enjoy working out, binge-watching copious amounts of TV, and mindlessly supporting a Formula 1 team (<em>Forza Ferrari!</em>).</p>
       </div>
@@ -182,7 +182,7 @@ function renderContact(el) {
     <h1 class="section-h1">Contact</h1>
     <div class="contact-card">
       <p style="color:var(--text-muted);font-size:0.88rem">You can reach me at</p>
-      <a href="mailto:ritviksn@mit.edu" class="contact-email">ritviksn [at] mit [dot] edu</a>
+      <a href="mailto:rnarayan4@wisc.edu" class="contact-email">rnarayan4 [at] wisc [dot] edu</a>
       <div style="margin-top:2rem;display:flex;justify-content:center;gap:1rem">
         <a href="https://www.linkedin.com/in/ritviksainarayan/" target="_blank" rel="noopener" class="social-icon" title="LinkedIn"><i class="bi bi-linkedin"></i></a>
         <a href="https://github.com/ritviksainarayan" target="_blank" rel="noopener" class="social-icon" title="GitHub"><i class="bi bi-github"></i></a>
@@ -822,4 +822,21 @@ function renderContact(el) {
   updateLcBtn();
   requestAnimationFrame(render);
 
+})();
+
+
+// ── Corner menu (apps dropdown) ───────────────
+(function () {
+  const menu = document.getElementById('corner-menu');
+  const btn  = document.getElementById('corner-btn');
+  const dd   = document.getElementById('corner-dropdown');
+  if (!menu || !btn || !dd) return;
+  function setOpen(open) {
+    menu.classList.toggle('open', open);
+    dd.hidden = !open;
+    btn.setAttribute('aria-expanded', String(open));
+  }
+  btn.addEventListener('click', e => { e.stopPropagation(); setOpen(dd.hidden); });
+  document.addEventListener('click', e => { if (!menu.contains(e.target)) setOpen(false); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') setOpen(false); });
 })();
