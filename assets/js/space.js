@@ -53,7 +53,7 @@ const panelName = document.getElementById('panel-name');
 const SECTIONS = {
   about:    { name: 'About',    dotColor: '#FFB020', render: renderAbout    },
   contact:  { name: 'Contact',  dotColor: '#48C8E0', render: renderContact  },
-  cv:       { name: 'CV',       dotColor: '#E88A5A', render: renderCV       },
+  cv:       { name: 'CV',       dotColor: '#E88A5A', href: 'cv.pdf'         },
   research: { name: 'Research', dotColor: '#E8B860', render: renderResearch },
 };
 
@@ -61,6 +61,14 @@ const SECTIONS = {
 window.openPanel = function (key, origin) {
   const sec = SECTIONS[key];
   if (!sec) return;
+
+  // Link-only sections (the CV) open in the browser's own PDF viewer
+  if (sec.href) {
+    const w = window.open(sec.href, '_blank');
+    if (w) w.opener = null;
+    else location.href = sec.href;
+    return;
+  }
 
   let cx = '50%', cy = '50%';
   if (origin) {
@@ -109,7 +117,8 @@ window.addEventListener('popstate', e => {
 
 window.addEventListener('DOMContentLoaded', () => {
   const hash = location.hash.replace('#', '');
-  if (SECTIONS[hash]) openPanel(hash);
+  if (SECTIONS[hash] && SECTIONS[hash].href) location.replace(SECTIONS[hash].href);
+  else if (SECTIONS[hash]) openPanel(hash);
 });
 
 // ── Section Renderers ─────────────────────────
@@ -127,7 +136,7 @@ function renderAbout(el) {
         </div>
       </div>
       <div class="about-bio">
-        <p>I am an incoming PhD student at <a href="https://physics.mit.edu/" target="_blank" rel="noopener">MIT</a> working on exoplanet and stellar astronomy, having double-majored in Astrophysics and Economics at the <a href="https://www.astro.wisc.edu/" target="_blank" rel="noopener">University of Wisconsin–Madison</a>.</p>
+        <p>I am a first-year PhD student at <a href="https://physics.mit.edu/" target="_blank" rel="noopener">MIT</a> and a Thomas Frank &amp; Henry W. Kendall Fellow, working on exoplanet dynamics. I double-majored in Astrophysics and Economics at the <a href="https://www.astro.wisc.edu/" target="_blank" rel="noopener">University of Wisconsin–Madison</a>.</p>
         <p>I like thinking about the evolution of stars and exoplanets, from both observational and theoretical lenses. I also enjoy the data science and computational aspects of modern astronomy, and care about how to effectively communicate science results with meaningful visualizations.</p>
         <p>In my free time, I enjoy working out, binge-watching copious amounts of TV, and mindlessly supporting a Formula 1 team (<em>Forza Ferrari!</em>).</p>
       </div>
@@ -168,21 +177,12 @@ function renderResearch(el) {
   `;
 }
 
-function renderCV(el) {
-  el.innerHTML = `
-    <h1 class="section-h1">Curriculum Vitae</h1>
-    <div class="cv-wrap">
-      <iframe src="cv.pdf#view=FitH" title="Ritvik Sai Narayan — CV"></iframe>
-    </div>
-  `;
-}
-
 function renderContact(el) {
   el.innerHTML = `
     <h1 class="section-h1">Contact</h1>
     <div class="contact-card">
       <p style="color:var(--text-muted);font-size:0.88rem">You can reach me at</p>
-      <a href="mailto:rnarayan4@wisc.edu" class="contact-email">rnarayan4 [at] wisc [dot] edu</a>
+      <a href="mailto:ritviksn@mit.edu" class="contact-email">ritviksn [at] mit [dot] edu</a>
       <div style="margin-top:2rem;display:flex;justify-content:center;gap:1rem">
         <a href="https://www.linkedin.com/in/ritviksainarayan/" target="_blank" rel="noopener" class="social-icon" title="LinkedIn"><i class="bi bi-linkedin"></i></a>
         <a href="https://github.com/ritviksainarayan" target="_blank" rel="noopener" class="social-icon" title="GitHub"><i class="bi bi-github"></i></a>
