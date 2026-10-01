@@ -5,6 +5,96 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Ritvik Sai Narayan</title>
   <meta name="description" content="Ritvik Sai Narayan — PhD student at MIT, astrophysicist working on exoplanet and stellar astronomy.">
+  <meta name="author" content="Ritvik Sai Narayan">
+  <link rel="canonical" href="https://ritviksainarayan.com/">
+
+  <!-- Open Graph / social previews -->
+  <meta property="og:type" content="profile">
+  <meta property="og:site_name" content="Ritvik Sai Narayan">
+  <meta property="og:title" content="Ritvik Sai Narayan">
+  <meta property="og:description" content="Astrophysicist and MIT Physics PhD student working on exoplanets and stellar evolution.">
+  <meta property="og:url" content="https://ritviksainarayan.com/">
+  <meta property="og:image" content="https://ritviksainarayan.com/assets/img/profile/profile.jpeg">
+  <meta property="og:image:width" content="1061">
+  <meta property="og:image:height" content="1061">
+  <meta property="og:image:alt" content="Ritvik Sai Narayan">
+  <meta property="profile:first_name" content="Ritvik">
+  <meta property="profile:last_name" content="Sai Narayan">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Ritvik Sai Narayan">
+  <meta name="twitter:description" content="Astrophysicist and MIT Physics PhD student working on exoplanets and stellar evolution.">
+  <meta name="twitter:image" content="https://ritviksainarayan.com/assets/img/profile/profile.jpeg">
+
+  <!-- Structured data: identifies this site as the official page for this person -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Person",
+        "@id": "https://ritviksainarayan.com/#person",
+        "name": "Ritvik Sai Narayan",
+        "alternateName": "Ritvik Narayan",
+        "givenName": "Ritvik",
+        "familyName": "Sai Narayan",
+        "url": "https://ritviksainarayan.com/",
+        "image": "https://ritviksainarayan.com/assets/img/profile/profile.jpeg",
+        "email": "mailto:ritviksn@mit.edu",
+        "jobTitle": "PhD Student in Physics",
+        "description": "Astrophysicist and MIT Physics PhD student working on exoplanet dynamics, exoplanet populations, and stellar evolution.",
+        "affiliation": [
+          {
+            "@type": "CollegeOrUniversity",
+            "name": "Massachusetts Institute of Technology",
+            "url": "https://physics.mit.edu/",
+            "sameAs": "https://www.wikidata.org/wiki/Q49108"
+          },
+          {
+            "@type": "ResearchOrganization",
+            "name": "MIT Kavli Institute for Astrophysics and Space Research",
+            "url": "https://www.space.mit.edu/",
+            "parentOrganization": { "@type": "CollegeOrUniversity", "name": "Massachusetts Institute of Technology" }
+          }
+        ],
+        "alumniOf": {
+          "@type": "CollegeOrUniversity",
+          "name": "University of Wisconsin–Madison",
+          "sameAs": "https://www.wikidata.org/wiki/Q838330"
+        },
+        "award": "Thomas Frank & Henry W. Kendall Fellowship",
+        "knowsAbout": ["Astrophysics", "Exoplanets", "Exoplanet dynamics", "Stellar evolution", "Binary stars", "Blue straggler stars", "Nancy Grace Roman Space Telescope", "Astronomical data science"],
+        "subjectOf": {
+          "@type": "NewsArticle",
+          "headline": "This Star Just Ate a Planet, and It’s Not Done Yet",
+          "url": "https://www.nytimes.com/2026/07/09/science/space/planetary-engulfment-hungry-star.html",
+          "datePublished": "2026-07-09",
+          "publisher": { "@type": "Organization", "name": "The New York Times" }
+        },
+        "sameAs": [
+          "https://orcid.org/0009-0007-0488-5685",
+          "https://scholar.google.com/citations?user=sLscPDIAAAAJ",
+          "https://www.space.mit.edu/people/ritvik-narayan/",
+          "https://github.com/ritviksainarayan",
+          "https://www.linkedin.com/in/ritviksainarayan/"
+        ]
+      },
+      {
+        "@type": "ProfilePage",
+        "@id": "https://ritviksainarayan.com/#webpage",
+        "url": "https://ritviksainarayan.com/",
+        "name": "Ritvik Sai Narayan",
+        "mainEntity": { "@id": "https://ritviksainarayan.com/#person" }
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://ritviksainarayan.com/#website",
+        "url": "https://ritviksainarayan.com/",
+        "name": "Ritvik Sai Narayan",
+        "publisher": { "@id": "https://ritviksainarayan.com/#person" }
+      }
+    ]
+  }
+  </script>
 
   <!-- Favicons -->
   <link href="assets/img/favicon.png" rel="icon">
@@ -118,6 +208,20 @@
       transition: transform 0.2s;
     }
     .news-pill:hover .news-arrow { transform: translate(2px, -2px); }
+
+    /* static bio for crawlers + screen readers; not shown visually */
+    .visually-hidden {
+      position: absolute !important;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      clip-path: inset(50%);
+      white-space: nowrap;
+      border: 0;
+    }
 
     /* phones: keep just "In the News · The New York Times ↗" */
     @media (max-width: 640px) {
@@ -234,6 +338,24 @@
       Contact
     </button>
   </nav>
+
+  <!-- ── Static profile (same content as the About/Research/Contact panels) ── -->
+  <section class="visually-hidden" aria-labelledby="static-profile-name">
+    <h2 id="static-profile-name">Ritvik Sai Narayan</h2>
+    <p>Astrophysicist · MIT Physics PhD Student · Exoplanets &amp; Stellar Evolution</p>
+    <p>I am a first-year PhD student at <a href="https://physics.mit.edu/">MIT</a> and a Thomas Frank &amp; Henry W. Kendall Fellow, working on exoplanet dynamics. I double-majored in Astrophysics and Economics at the <a href="https://www.astro.wisc.edu/">University of Wisconsin–Madison</a>.</p>
+    <p>I like thinking about the evolution of stars and exoplanets, from both observational and theoretical lenses. I also enjoy the data science and computational aspects of modern astronomy, and care about how to effectively communicate science results with meaningful visualizations.</p>
+    <p>Research: exoplanet astronomy, including transit yield forecasts for the Nancy Grace Roman Space Telescope; stellar evolution and binary mass transfer, including Blue Straggler Stars and white dwarf remnants; and astronomical data science and visualization.</p>
+    <ul>
+      <li><a href="cv.pdf">CV</a></li>
+      <li><a href="mailto:ritviksn@mit.edu">ritviksn@mit.edu</a></li>
+      <li><a href="https://orcid.org/0009-0007-0488-5685" rel="me">ORCID</a></li>
+      <li><a href="https://scholar.google.com/citations?user=sLscPDIAAAAJ" rel="me">Google Scholar</a></li>
+      <li><a href="https://www.space.mit.edu/people/ritvik-narayan/">MIT Kavli Institute profile</a></li>
+      <li><a href="https://github.com/ritviksainarayan" rel="me">GitHub</a></li>
+      <li><a href="https://www.linkedin.com/in/ritviksainarayan/" rel="me">LinkedIn</a></li>
+    </ul>
+  </section>
 
   <script src="assets/js/space.js"></script>
 </body>
